@@ -1,17 +1,30 @@
-// routes/authRoutes.js
+// Arquivo: back/server.js
+
 const express = require('express');
-const router = express.Router();
+const cors = require('cors'); // Necessário para permitir requisições do front-end
+const app = express();
+const port = 3001; // Porta padrão para o backend
 
-// Importa a função do Controller (a sua lógica de cadastro)
-const authController = require('../controllers/authController'); 
+// Importa o arquivo de rotas de autenticação
+const authRoutes = require('./routes/authRoutes');
+// --- COMENTÁRIO DE INSTRUÇÃO DE BANCO ---
+// ATENÇÃO: As rotas estão usando um MOCK de banco de dados
+// para simular o armazenamento, garantindo que NENHUM banco de dados real seja linkado AGORA.
+// A lógica real de conexão foi desativada no modelo 'usuarios.js'.
+// ---------------------------------------
 
-// 1. Rota de Cadastro
-// O endpoint completo será: POST para /api/auth/cadastro
-// (O prefixo '/api/auth' é definido no seu server.js)
-router.post('/cadastro', authController.cadastrarUsuario); 
+// Middleware: Permite que o servidor aceite dados em formato JSON
+app.use(express.json());
 
-// Futuramente, você adicionará a rota de login aqui:
-// router.post('/login', authController.loginUsuario); 
+// Middleware: Configuração do CORS
+// Permite requisições de qualquer origem (ideal para desenvolvimento)
+app.use(cors());
 
-// 2. É ESSENCIAL EXPORTAR O OBJETO ROUTER
-module.exports = router;
+// Define as rotas
+// Sempre que uma requisição começar com '/api/auth', ela será direcionada para authRoutes
+app.use('/api/auth', authRoutes);
+
+// Inicia o servidor Node.js
+app.listen(port, () => {
+    console.log(`Servidor rodando com sucesso na porta ${port}`);
+});

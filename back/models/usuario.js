@@ -1,54 +1,53 @@
-// Arquivo: back/models/Usuario.js
+// Arquivo: back/models/usuarios.js
 
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); 
-const bcrypt = require('bcryptjs'); // Importa o bcrypt para o hook
+// --- BLOCO DE CONEXÃO DESATIVADO TEMPORARIAMENTE ---
+// COMENTE as linhas que fazem a importação do driver de banco de dados
+// e a conexão real. Isso impede o erro de conexão no servidor Node.js
+// sem ter que apagar o código de banco permanentemente.
+// ----------------------------------------------------
 
-// Define o modelo 'Usuario' que corresponde à sua tabela 'usuarios' no MySQL
-const Usuario = sequelize.define('Usuario', {
-    // ... suas definições de campos ...
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    },
-    nome: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-    },
-    sobrenome: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-    },
-    email: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        unique: true, 
-    },
-    senha: { 
-        type: DataTypes.STRING(255), 
-        allowNull: false,
-    },
-    cpf: {
-        type: DataTypes.STRING(14),
-        allowNull: true,
-        unique: true,
-    },
-}, {
-    tableName: 'usuarios', 
-    timestamps: true,
-});
+// const db = require('../config/database'); // <--- Comente esta linha para não carregar a conexão
+let mockDatabase = []; // VAI CONTINUAR SENDO USADO TEMPORARIAMENTE
+let nextId = 1;      // VAI CONTINUAR SENDO USADO TEMPORARIAMENTE
 
-// Hook (Gatilho) para criptografar a senha antes de salvar/atualizar
-Usuario.beforeCreate(async (usuario) => {
-    if (usuario.senha) {
-        const salt = await bcrypt.genSalt(10);
-        usuario.senha = await bcrypt.hash(usuario.senha, salt);
+
+// Objeto que exporta as funções do modelo
+const Usuario = {
+    // Simula a busca de um usuário por email OU CPF
+    findByEmailOrCpf: async (email, cpf) => {
+        
+        // --- FUTURA LÓGICA DE BANCO DE DADOS AQUI ---
+        // Quando for conectar, o código de query SQL virá aqui.
+        // Exemplo: return db.execute('SELECT * FROM usuarios WHERE email = ? OR cpf = ?', [email, cpf]);
+        // --------------------------------------------
+        
+        // Versão MOCK (Temporária para evitar erro 500):
+        const user = mockDatabase.find(u => u.email === email || u.cpf === cpf);
+        return user;
+    },
+
+    // Simula a criação de um novo usuário
+    create: async (nome, sobrenome, email, senhaHash, cpf) => {
+        
+        // --- FUTURA LÓGICA DE BANCO DE DADOS AQUI ---
+        // Quando for conectar, o código de query SQL virá aqui.
+        // Exemplo: const [result] = await db.execute('INSERT INTO usuarios ...');
+        // --------------------------------------------
+        
+        // Versão MOCK (Temporária para evitar erro 500):
+        const novoUsuario = {
+            id: nextId++,
+            nome: nome,
+            sobrenome: sobrenome,
+            email: email,
+            senhaHash: senhaHash,
+            cpf: cpf,
+            dataCriacao: new Date()
+        };
+
+        mockDatabase.push(novoUsuario);
+        return novoUsuario;
     }
-});
-
-// COMENTADO TEMPORARIAMENTE: Esta linha força a conexão com o DB.
-// Você pode descomentá-la (ou usar o sequelize.sync() no server.js) quando for conectar o banco.
-// Usuario.sync(); 
+};
 
 module.exports = Usuario;

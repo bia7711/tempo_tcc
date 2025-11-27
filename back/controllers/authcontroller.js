@@ -1,14 +1,12 @@
 // Arquivo: back/controllers/authController.js
 
-// 1. IMPORTAÇÕES
-// Garanta que o caminho para o seu model 'Usuario.js' esteja correto:
-const Usuario = require('../models/usuario'); 
-const bcrypt = require('bcryptjs'); // Necessário para a comparação de senhas em futuros logins
+const Usuario = require('../models/Usuario'); 
+const bcrypt = require('bcryptjs'); // Necessário para a comparação de senhas em hash
 
 // Função que processa a requisição POST de cadastro
 exports.cadastrarUsuario = async (req, res) => {
     // 1. Recebe os dados do formulário
-    const { nome, sobrenome, email, senha, confirmaSenha, cpf } = req.body;
+    const { nome, sobrenome, email, senha, confirmaSenha, cpf } = req.body; // CPF está incluído no destructuring
 
     // 2. Validações iniciais
     if (senha !== confirmaSenha) {
@@ -16,54 +14,48 @@ exports.cadastrarUsuario = async (req, res) => {
         return res.status(400).json({ mensagem: 'As senhas não coincidem.' });
     }
 
-    // Verifica a obrigatoriedade dos campos
-    if (!nome || !sobrenome || !email || !senha) {
+    // ALTERAÇÃO AQUI: CPF é obrigatório.
+    // Garante que nome, sobrenome, email, senha E CPF não estejam vazios.
+    if (!nome || !sobrenome || !email || !senha || !cpf) {
         // Retorna erro se faltar algum campo obrigatório
-        return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
+        return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios (Nome, Sobrenome, Email, Senha e CPF).' });
     }
 
     try {
-        // 3. Verifica se o E-mail já existe
-        let usuarioExistente = await Usuario.findOne({ where: { email } });
-        if (usuarioExistente) {
-            return res.status(409).json({ mensagem: 'E-mail já cadastrado.' });
-        }
-        
-        // Verifica se o CPF já existe
-        if (cpf) {
-            usuarioExistente = await Usuario.findOne({ where: { cpf } });
-            if (usuarioExistente) {
-                 return res.status(409).json({ mensagem: 'CPF já cadastrado.' });
-            }
-        }
-        
-        // 4. Cria o novo usuário.
-        // A senha será criptografada automaticamente pelo 'hook' no Usuario.js ANTES de ir para o DB.
-        const novoUsuario = await Usuario.create({
-            nome,
-            sobrenome,
-            email,
-            senha, // O model cuidará do hash
-            cpf, 
-        });
+        // 3. Verifica se o email ou CPF já estão cadastrados
+        // Usaremos uma query OR na função do modelo para eficiência
+        const usuarioExistente = await Usuario.findByEmailOrCpf(email, cpf);
 
-        // 5. Resposta de Sucesso (Status 201 Created)
+        if (usuarioExistente) {
+            let mensagemErro = 'Este email já está cadastrado.';
+            if (usuarioExistente.cpf === cpf) {
+                mensagemErro = 'Este CPF já está cadastrado.';
+            }
+            // Retorna status 409 Conflict se o recurso já existir
+            return res.status(409).json({ mensagem: mensagemErro });
+        }
+
+        // 4. Hash da senha
+        const salt = await bcrypt.genSalt(10);
+        const senhaHash = await bcrypt.hash(senha, salt);
+
+        // 5. Cria o novo usuário no banco de dados
+        const novoUsuario = await Usuario.create(nome, sobrenome, email, senhaHash, cpf);
+
+        // 6. Resposta de sucesso (Status 201 Created)
+        // Por segurança, não retorne a senhaHash
         return res.status(201).json({ 
             mensagem: 'Usuário cadastrado com sucesso!', 
-            usuario: { 
-                id: novoUsuario.id, 
+            usuario: {
+                id: novoUsuario.id,
                 nome: novoUsuario.nome,
-                email: novoUsuario.email 
+                email: novoUsuario.email
+                // Outros campos públicos
             }
         });
-
     } catch (error) {
-        // 6. Resposta de Erro no Servidor
-        console.error('Erro no cadastro:', error.message);
-        // Retorna um erro 500 para qualquer problema inesperado com o banco ou servidor
-        return res.status(500).json({ mensagem: 'Erro interno do servidor ao tentar cadastrar.' });
+        console.error('Erro no cadastro de usuário:', error);
+        // Retorna erro interno do servidor
+        return res.status(500).json({ mensagem: 'Erro interno do servidor ao processar o cadastro.' });
     }
 };
-
-// Futuramente, as funções de login e logout virão aqui.
-// exports.loginUsuario = async (req, res) => { ... };

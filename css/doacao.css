@@ -8,7 +8,7 @@ body {
     font-family: Arial, sans-serif; /* Use sua fonte preferida aqui */
     margin: 0;
     /* Ajuste o padding-top conforme a altura do seu cabeçalho (nav) */
-    padding-top: 80px; 
+    padding-top: 0px; 
 }
 
 /* Container que centraliza o formulário */

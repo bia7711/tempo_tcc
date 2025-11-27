@@ -2,11 +2,12 @@
 
 const express = require('express');
 const router = express.Router();
-// Importa o Controller que contém a lógica de manipulação da doação (Passo 7B)
+
+// Importa o Controller que contém a lógica de manipulação da doação
 const doacaoController = require('../controllers/doacaoController'); 
 
 // Rota POST para processar o formulário de doação de duas etapas.
-// O Front-end deve enviar os dados (dados pessoais + dados da doação) para este endpoint.
-router.post('/registrar', doacaoController.handleDoacao);
+// Agora usa o nome de função correto: registrarDoacao
+router.post('/registrar', doacaoController.registrarDoacao);
 
 module.exports = router;

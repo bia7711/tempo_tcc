@@ -40,7 +40,7 @@ strong {
 /* --- ESTILO DO HEADER (O seu "quadrado esticado" com o título) --- */
 header {
     width: 100%; /* LARGURA TOTAL */
-    padding: 80px 20px; /* BOM ESPAÇO INTERNO/ALTURA */
+    padding: 20px 20px; /* BOM ESPAÇO INTERNO/ALTURA */
     background-color: var(--cor-fundo-suave); /* Fundo suave para contraste */
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); 
     text-align: center; /* CENTRALIZA o título */

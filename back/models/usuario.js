@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs'); // Importa o bcrypt para o hook
 
 // Define o modelo 'Usuario' que corresponde à sua tabela 'usuarios' no MySQL
 const Usuario = sequelize.define('Usuario', {
+    // ... suas definições de campos ...
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -22,20 +23,20 @@ const Usuario = sequelize.define('Usuario', {
     email: {
         type: DataTypes.STRING(100),
         allowNull: false,
-        unique: true, // Garante que e-mails duplicados não sejam aceitos
+        unique: true, 
     },
     senha: { 
-        type: DataTypes.STRING(255), // Campo para o hash da senha (segurança)
+        type: DataTypes.STRING(255), 
         allowNull: false,
     },
     cpf: {
         type: DataTypes.STRING(14),
-        allowNull: true, // Se for obrigatório, mude para 'false'
+        allowNull: true,
         unique: true,
     },
 }, {
     tableName: 'usuarios', 
-    timestamps: true, // Adiciona colunas createdAt e updatedAt
+    timestamps: true,
 });
 
 // Hook (Gatilho) para criptografar a senha antes de salvar/atualizar
@@ -46,7 +47,8 @@ Usuario.beforeCreate(async (usuario) => {
     }
 });
 
-// Sincroniza o modelo com o banco de dados (cria a tabela 'usuarios' se ela não existir)
-Usuario.sync();
+// COMENTADO TEMPORARIAMENTE: Esta linha força a conexão com o DB.
+// Você pode descomentá-la (ou usar o sequelize.sync() no server.js) quando for conectar o banco.
+// Usuario.sync(); 
 
 module.exports = Usuario;

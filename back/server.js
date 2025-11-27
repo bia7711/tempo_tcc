@@ -25,12 +25,15 @@ app.use(express.json());
 // Para aceitar dados de formulários
 app.use(express.urlencoded({ extended: true })); 
 
-// 4. Conexão com o Banco de Dados (É ESSENCIAL QUE database.js tenha as credenciais corretas)
+// 4. Conexão com o Banco de Dados (TEMPORARIAMENTE COMENTADA)
+// Comentamos esta seção para que o servidor possa iniciar sem o MySQL.
+/*
 const sequelize = require('./config/database');
 // Esta linha tenta autenticar a conexão ao iniciar o servidor
 sequelize.authenticate()
     .then(() => console.log('Conexão com o MySQL estabelecida com sucesso.'))
     .catch(err => console.error('ERRO: Não foi possível conectar ao MySQL.', err));
+*/
 
 
 // 5. Integração das Rotas

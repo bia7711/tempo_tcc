@@ -1,19 +1,22 @@
-// Arquivo: back/config/database.js
+// back/config/database.js
 
 const { Sequelize } = require('sequelize');
+// PRECISAMOS GARANTIR A LEITURA DO ARQUIVO .ENV
+require('dotenv').config(); 
 
-// Configuração do MySQL usando Sequelize
-// **ATENÇÃO: Mude 'nome_do_banco', 'usuario_db', e 'senha_db' pelos seus dados reais!**
-const sequelize = new Sequelize('nome_do_banco', 'usuario_db', 'senha_db', {
-    host: 'localhost', // Mude se o banco de dados não estiver na sua máquina local
-    dialect: 'mysql',
-    logging: false, // Define para 'true' se quiser ver as queries SQL no console
-    pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    },
-});
+const connection = new Sequelize(
+    // 1. Nome do Banco
+    process.env.DB_NAME, 
+    // 2. Usuário do Banco
+    process.env.DB_USER, 
+    // 3. Senha do Banco
+    process.env.DB_PASS, 
+    {
+        host: process.env.DB_HOST || 'localhost',
+        dialect: 'mysql',
+        logging: false,
+    }
+);
 
-module.exports = sequelize;
+// OBS: Renomeei 'sequelize' para 'connection' para manter a consistência com os Models
+module.exports = connection;

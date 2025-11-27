@@ -6,6 +6,7 @@ const router = express.Router();
 const contatoController = require('../controllers/contatoController'); 
 
 // Define que requisições POST para '/api/contato/enviar' serão tratadas pelo Controller
-router.post('/enviar', contatoController.enviarDuvida);
+// CORREÇÃO: Usando a função exportada corretamente: handleContato
+router.post('/enviar', contatoController.handleContato);
 
 module.exports = router;

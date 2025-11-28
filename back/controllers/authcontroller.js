@@ -1,3 +1,8 @@
+// back/controllers/authController.js
+
+const Empresa = require('../models/empresa'); // NOVO: Importa o Model de Empresa
+const bcrypt = require('bcrypt'); // NOVO: Importa o bcrypt para criptografia de senha
+
 // Este arquivo contém a lógica (Controllers) para todas as rotas de autenticação.
 
 // =================================================================
@@ -35,23 +40,48 @@ const verificarVoluntario = (req, res, next) => {
 const cadastrarEmpresa = async (req, res) => {
     const { nomeEmpresa, cnpj, email, senha, confirmaSenha } = req.body;
 
-    // --- Lógica de Validação e DB AQUI ---
+    // 1. Lógica de Validação
     if (!nomeEmpresa || !cnpj || !email || !senha) {
         return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios.' });
     }
     if (senha !== confirmaSenha) {
         return res.status(400).json({ mensagem: 'As senhas não coincidem.' });
     }
-    
-    // ATENÇÃO: A lógica de SALVAR NO BANCO DE DADOS deve ser adicionada aqui.
 
-    // Se o cadastro for bem-sucedido:
-    req.session.userType = 'empresa'; // CRIA A SESSÃO e define o tipo
-    req.session.email = email;
-    req.session.nome = nomeEmpresa; 
+    try {
+        // 2. Checar se Email ou CNPJ já existem
+        const empresaExistente = await Empresa.findOne({ $or: [{ email }, { cnpj }] });
+        if (empresaExistente) {
+            return res.status(409).json({ mensagem: 'Email ou CNPJ já cadastrados.' });
+        }
 
-    // Redireciona para a área protegida da empresa.
-    return res.redirect('/empresas.html');
+        // 3. Criptografar a Senha
+        const salt = await bcrypt.genSalt(10);
+        const senhaHash = await bcrypt.hash(senha, salt);
+
+        // 4. Criar e Salvar a Nova Empresa no BD
+        const novaEmpresa = new Empresa({
+            nomeEmpresa,
+            cnpj,
+            email,
+            senha: senhaHash // Salva a senha CRIPTOGRAFADA
+        });
+
+        await novaEmpresa.save();
+
+        // 5. Criação da Sessão e Redirecionamento
+        req.session.userType = 'empresa'; 
+        req.session.email = novaEmpresa.email;
+        req.session.nome = novaEmpresa.nomeEmpresa; 
+        req.session.userId = novaEmpresa._id;
+        
+        // Redireciona para a área protegida da empresa.
+        return res.redirect('/empresas.html');
+
+    } catch (erro) {
+        console.error('Erro ao cadastrar empresa:', erro);
+        return res.status(500).json({ mensagem: 'Erro interno do servidor ao cadastrar.' });
+    }
 };
 
 const cadastrarVoluntario = async (req, res) => {
@@ -65,7 +95,7 @@ const cadastrarVoluntario = async (req, res) => {
         return res.status(400).json({ mensagem: 'As senhas não coincidem.' });
     }
 
-    // ATENÇÃO: A lógica de SALVAR NO BANCO DE DADOS deve ser adicionada aqui.
+    // ATENÇÃO: A lógica de SALVAR NO BANCO DE DADOS do Voluntário deve ser adicionada aqui.
 
     // Se o cadastro for bem-sucedido:
     req.session.userType = 'voluntario'; // CRIA A SESSÃO e define o tipo

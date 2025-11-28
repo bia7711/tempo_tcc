@@ -14,12 +14,12 @@
             <h1>Tempo de Florescer</h1>
             <nav>
                 <ul>
-         <li><a href="./index.html">Home</a></li> 
+            <li><a href="./index.html">Home</a></li> 
                 <li><a href="./quemsomos.html">Quem somos</a></li>
                 <li><a href="./contatos.html">Contato</a></li>
                 <li><a href="./doacao.html">Doe</a></li>
                 <li><a href="./voluntarios.html">Voluntários</a></li>
-                <li><a href="entrarempresa.html">Empresas</a></li> s
+                <li><a href="entrarempresa.html">Empresas</a></li> 
                 </ul>
             </nav>
         </div>
@@ -27,7 +27,7 @@
             <div class="form-header">
                 <h2>Não tem uma conta? Crie uma!</h2>
             </div>
-            <form action="#" method="POST">
+            <form action="/register/empresa" method="POST"> 
                 <div class="input-group">
                     <label for="nomeEmpresa">Nome da Empresa/Investidor:</label>
                     <input type="text" id="nomeEmpresa" name="nomeEmpresa" placeholder="Digite o nome da empresa" required>
@@ -42,22 +42,22 @@
                 </div>
                 <div class="input-group">
                     <label for="password">Senha:</label>
-                    <input type="password" id="password" name="password" placeholder="Crie uma senha" required>
+                    <input type="password" id="password" name="senha" placeholder="Crie uma senha" required>
                 </div>
                 <div class="input-group">
                     <label for="confirm_password">Confirmar Senha:</label>
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirme sua senha" required>
+                    <input type="password" id="confirm_password" name="confirmaSenha" placeholder="Confirme sua senha" required>
                 </div>
                 <div style="display: flex; align-items: center;">
-    <input type="checkbox" id="termos">
-    <label for="termos">Concordo com os Termos e Condições</label>
-</div>
+            <input type="checkbox" id="termos">
+            <label for="termos">Concordo com os Termos e Condições</label>
+        </div>
                 <button type="submit" class="btn-register">Registrar</button>
             </form>
             
             <div class="form-footer">
-                <p>Já tem uma conta? <a href="#">Faça login</a></p>
-                <a href="#">Esqueceu a senha?</a>
+                <p>Já tem uma conta? <a href="./entrarempresa.html">Faça login</a></p>
+                <a href="./redefinirsenha.html">Esqueceu a senha?</a>
             </div>
         </div>
     </div>

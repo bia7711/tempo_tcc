@@ -1,30 +1,38 @@
-// Arquivo: back/server.js
+// Arquivo: /back/routes/authRoutes.js
 
 const express = require('express');
-const cors = require('cors'); // Necessário para permitir requisições do front-end
-const app = express();
-const port = 3001; // Porta padrão para o backend
+const router = express.Router();
+const path = require('path');
+const {
+    cadastrarEmpresa,
+    cadastrarVoluntario,
+    loginEmpresa,
+    loginVoluntario,
+    verificarEmpresa,
+    verificarVoluntario
+} = require('../controllers/authcontroller');
 
-// Importa o arquivo de rotas de autenticação
-const authRoutes = require('./routes/authRoutes');
-// --- COMENTÁRIO DE INSTRUÇÃO DE BANCO ---
-// ATENÇÃO: As rotas estão usando um MOCK de banco de dados
-// para simular o armazenamento, garantindo que NENHUM banco de dados real seja linkado AGORA.
-// A lógica real de conexão foi desativada no modelo 'usuarios.js'.
-// ---------------------------------------
+// --- ROTAS DE AUTENTICAÇÃO ---
 
-// Middleware: Permite que o servidor aceite dados em formato JSON
-app.use(express.json());
+router.post('/register/empresa', cadastrarEmpresa);
+router.post('/register/voluntario', cadastrarVoluntario);
+router.post('/login/empresa', loginEmpresa);
+router.post('/login/voluntario', loginVoluntario);
 
-// Middleware: Configuração do CORS
-// Permite requisições de qualquer origem (ideal para desenvolvimento)
-app.use(cors());
+// --- ROTAS PROTEGIDAS (Middleware em Ação!) ---
 
-// Define as rotas
-// Sempre que uma requisição começar com '/api/auth', ela será direcionada para authRoutes
-app.use('/api/auth', authRoutes);
-
-// Inicia o servidor Node.js
-app.listen(port, () => {
-    console.log(`Servidor rodando com sucesso na porta ${port}`);
+// 1. Rota para a área restrita da Empresa:
+// Se não for 'empresa', o middleware bloqueia antes de tentar enviar o HTML.
+router.get('/empresas', verificarEmpresa, (req, res) => {
+    // Caminho para o HTML estático na raiz do projeto (TEMPO_TCC):
+    res.sendFile(path.join(__dirname, '..', '..', 'empresas.html')); 
 });
+
+// 2. Rota para a área restrita do Voluntário:
+// Se não for 'voluntario', o middleware bloqueia antes de tentar enviar o HTML.
+router.get('/voluntarios', verificarVoluntario, (req, res) => {
+    // Caminho para o HTML estático na raiz do projeto (TEMPO_TCC):
+    res.sendFile(path.join(__dirname, '..', '..', 'voluntarios.html'));
+});
+
+module.exports = router;

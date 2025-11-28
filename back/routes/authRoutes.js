@@ -4,12 +4,15 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const {
-    cadastrarEmpresa,
-    cadastrarVoluntario,
-    loginEmpresa,
-    loginVoluntario,
-    verificarEmpresa,
-    verificarVoluntario
+    cadastrarEmpresa,
+    cadastrarVoluntario,
+    loginEmpresa,
+    loginVoluntario,
+    verificarEmpresa,
+    verificarVoluntario,
+    // --- NOVO: IMPORTAR AS FUNÇÕES DE STATUS DO CONTROLLER ---
+    verificarStatus, 
+    // buscarDadosPerfil // Vamos adicionar a rota dela também
 } = require('../controllers/authcontroller');
 
 // --- ROTAS DE AUTENTICAÇÃO ---
@@ -19,20 +22,21 @@ router.post('/register/voluntario', cadastrarVoluntario);
 router.post('/login/empresa', loginEmpresa);
 router.post('/login/voluntario', loginVoluntario);
 
+// --- ROTAS DE API PARA O MINI PERFIL (PÚBLICA) ---
+// O URL completo será: /api/auth/status
+router.get('/status', verificarStatus); // <--- ROTA CRÍTICA ADICIONADA!
+// router.get('/perfil', verificarVoluntario, buscarDadosPerfil); // Rota protegida do Mini Perfil
+
 // --- ROTAS PROTEGIDAS (Middleware em Ação!) ---
 
 // 1. Rota para a área restrita da Empresa:
-// Se não for 'empresa', o middleware bloqueia antes de tentar enviar o HTML.
 router.get('/empresas', verificarEmpresa, (req, res) => {
-    // Caminho para o HTML estático na raiz do projeto (TEMPO_TCC):
-    res.sendFile(path.join(__dirname, '..', '..', 'empresas.html')); 
+    res.sendFile(path.join(__dirname, '..', '..', 'empresas.html')); 
 });
 
 // 2. Rota para a área restrita do Voluntário:
-// Se não for 'voluntario', o middleware bloqueia antes de tentar enviar o HTML.
 router.get('/voluntarios', verificarVoluntario, (req, res) => {
-    // Caminho para o HTML estático na raiz do projeto (TEMPO_TCC):
-    res.sendFile(path.join(__dirname, '..', '..', 'voluntarios.html'));
+    res.sendFile(path.join(__dirname, '..', '..', 'voluntarios.html'));
 });
 
 module.exports = router;

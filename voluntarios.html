@@ -11,14 +11,24 @@
 <body>
 
     <header class="header">
-       
+        <nav>
+            <div>
+                <img src="./img/novalogo.png" alt="Logo da organização">
+            </div>
+            <div class="alinhamento">
+                <ul>
+                    <li><a href="./index.html">Home</a></li> 
+                    <li><a href="./quemsomos.html">Quem somos</a></li>
+                    <li><a href="./contatos.html">Contato</a></li>
+                    <li><a href="./doacao.html">Doe</a></li>
+                    <li><a href="./voluntarios.html">Voluntários</a></li>
+                    <li><a href="entrarempresa.html">Empresas</a></li> 
+                </ul>
+            </div>
+        </nav>
     </header>
 
-    <div id="statusSessao" style="padding: 10px; margin-top: 10px; background-color: #f0fff0; border: 1px solid #c8e6c9; text-align: center;">
-        Carregando status de sessão...
-    </div>
-
-    <section class="hero">
+        <section class="hero">
         <div class="leaf-decoration"></div>
         <h1>SEJA A SEMETE: FAÇA PARTE DO FLORESCER</h1>
         <h2>DOE SEU TEMPO E SUAS HABILIDADES POR CAUSAS AMBIENTAIS E SOCIAIS</h2>
@@ -35,7 +45,7 @@
                     <p>Ações de campo, plantio, manejo e recuperação de áreas degradadas.</p>
                     <span class="tag">Presencial</span>
                     <span class="tag">Meio Ambiente</span>
-                                        <a href="#" id="btnCandidatar" class="btn-candidatar">Me candidatar</a> 
+                    <a href="#" class="btn-candidatar">Me candidatar</a> 
                 </div>
             </div>
             <div class="area-card">
@@ -80,7 +90,6 @@
             </div>
             <div class="testimonial-card">
                 <p>"Me inscrevi sem saber ao certo o que esperar, mas encontrei propósito e satisfação. Cada atividade me faz perceber o quanto pequenas ações transformam vidas."</p>
-                <span class="author">- Carla M. Ribeiro</span>
             </div>
             <div class="testimonial-card">
                 <p>"Entrei achando que ia só separar lixo... agora já dei nome pras minhas minhocas! Antes, nem sabia que papel não é tudo que joga papel no chão. A ONG despertou meu lado social do plantio e reciclagem."</p>
@@ -121,61 +130,76 @@
         </div>
     </section>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Ação Necessária</h2>
+            <p>Você não está logado. Para se candidatar a esta vaga, por favor, entre na sua conta ou crie um novo cadastro.</p>
+            <div class="modal-actions">
+                <button id="btnModalEntrar" class="btn-primary">Entrar / Criar Conta</button>
+            </div>
+        </div>
+    </div>
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
             const BASE_URL = 'http://localhost:3001'; 
             
-            // Elementos HTML controlados (statusSessao e o primeiro botão btnCandidatar)
-            const statusElement = document.getElementById('statusSessao');
-            const btnCandidatar = document.getElementById('btnCandidatar');
+            // Elementos do Modal
+            const authModal = document.getElementById('authModal');
+            const btnModalEntrar = document.getElementById('btnModalEntrar');
+            const closeModal = document.querySelector('.close-button');
+
+            // Seleciona TODOS os botões de candidatura
+            const btnCandidatarList = document.querySelectorAll('.btn-candidatar');
             
-            try {
-                // 1. CHAMA A ROTA DE STATUS (SEM CONEXÃO DIRETA COM DB)
-                const response = await fetch(`${BASE_URL}/api/auth/status`);
-                const data = await response.json();
+            // Função para fechar o modal
+            const hideModal = () => {
+                authModal.style.display = 'none';
+            };
 
-                if (data.isLoggedIn && data.userType === 'voluntario') {
-                    // SE LOGADO (SUCESSO)
-                    
-                    if (statusElement) {
-                        statusElement.innerHTML = `
-                            <h2>Olá, ${data.nome || 'Voluntário'}!</h2>
-                            <p>Sua sessão está ativa. Você pode prosseguir com as candidaturas.</p>
-                            `;
-                    }
-                    
-                    // AÇÃO DO BOTÃO: Prosseguir com a candidatura
-                    if (btnCandidatar) {
-                        btnCandidatar.onclick = (e) => {
-                            e.preventDefault(); // Impede o link href="#" padrão
-                            alert('Sucesso! Você está logado e pode prosseguir com a candidatura.');
-                            // Aqui você pode mudar para o redirect da página de candidatura
-                            // window.location.href = '/candidatura-vaga-ativa.html'; 
-                        };
-                    }
+            // Event Listeners para fechar o modal
+            if (closeModal) closeModal.addEventListener('click', hideModal);
+            window.addEventListener('click', (event) => {
+                if (event.target === authModal) {
+                    hideModal();
+                }
+            });
 
-                } else {
-                    // SE NÃO LOGADO
-                    if (statusElement) {
-                         statusElement.textContent = 'Você não está logado. Por favor, crie sua conta para se candidatar.';
-                    }
-                    
-                    // AÇÃO DO BOTÃO: Redirecionar para o cadastro/login
-                    if (btnCandidatar) {
-                         btnCandidatar.onclick = (e) => {
-                            e.preventDefault(); // Impede o link href="#" padrão
-                            window.location.href = '/criar.html'; 
-                        };
-                    }
-                }
-            } catch (error) {
-                console.error('Erro ao verificar status:', error);
-                if (statusElement) {
-                    statusElement.textContent = 'Erro ao conectar com o servidor de autenticação.';
-                }
+            // Event Listener para o botão de Entrar/Criar Conta
+            if (btnModalEntrar) {
+                btnModalEntrar.addEventListener('click', () => {
+                    window.location.href = '/criar.html'; // Redireciona para o cadastro/login
+                });
             }
+
+            // APLICA A LÓGICA DE VERIFICAÇÃO DE SESSÃO A TODOS OS BOTÕES
+            btnCandidatarList.forEach(btnCandidatar => {
+                btnCandidatar.onclick = async (e) => {
+                    e.preventDefault(); 
+                    
+                    try {
+                        const response = await fetch(`${BASE_URL}/api/auth/status`);
+                        const data = await response.json();
+
+                        if (data.isLoggedIn && data.userType === 'voluntario') {
+                            // SE LOGADO (SUCESSO)
+                            alert('Sucesso! Você está logado e pode prosseguir com a candidatura.');
+                            // Redirecionamento para a página de candidatura de vaga ativa:
+                            // window.location.href = '/candidatura-vaga-ativa.html'; 
+
+                        } else {
+                            // NÃO LOGADO: MOSTRA O MODAL!
+                            authModal.style.display = 'flex'; // Torna o modal visível (Centralizado pelo CSS)
+                        }
+                    } catch (error) {
+                        console.error('Erro ao verificar status:', error);
+                        // Mensagem de erro no console para debug
+                        alert('Erro de conexão com o servidor de autenticação. Verifique o backend.');
+                    }
+                };
+            });
         });
-    </script>
+    </script>
 
 </body>
 </html>
